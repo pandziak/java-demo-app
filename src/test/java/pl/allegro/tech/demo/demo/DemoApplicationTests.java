@@ -30,6 +30,6 @@ public class DemoApplicationTests {
 
 		// then
 		Assertions.assertThat(responseEntity.getStatusCodeValue() == 200);
-		Assertions.assertThat(responseEntity.getBody() == "hello there");
+		Assertions.assertThat(responseEntity.getBody() == "hello there Heroku");
 	}
 }
