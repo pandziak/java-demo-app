@@ -1,4 +1,4 @@
-package pl.allegro.tech.demo.demo;
+package pl.allegro.tech.demo.api;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
