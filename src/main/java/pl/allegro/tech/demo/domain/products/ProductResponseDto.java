@@ -18,6 +18,11 @@ public class ProductResponseDto {
         this.name = name;
     }
 
+    public ProductResponseDto(Product product) {
+        this.id = product.getId();
+        this.name = product.getName();
+    }
+
     public String getId() {
         return id;
     }

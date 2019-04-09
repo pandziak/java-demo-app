@@ -4,6 +4,8 @@ public interface ProductFacade {
 
     ProductResponseDto findById(String id);
 
+    ProductsResponseDto findAll();
+
     ProductResponseDto create(ProductRequestDto dto);
 
     ProductResponseDto update(ProductUpdateDto dto);

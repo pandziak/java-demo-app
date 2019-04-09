@@ -4,9 +4,7 @@ import org.springframework.stereotype.Repository;
 import pl.allegro.tech.demo.domain.products.Product;
 import pl.allegro.tech.demo.infrastructure.products.exceptions.ProductNotFoundException;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Repository
 public class InMemoryProductRepository implements ProductRepository {
@@ -27,6 +25,11 @@ public class InMemoryProductRepository implements ProductRepository {
         }
 
         return product;
+    }
+
+    @Override
+    public List<Product> findAll() {
+        return new ArrayList<>(products.values());
     }
 
     @Override

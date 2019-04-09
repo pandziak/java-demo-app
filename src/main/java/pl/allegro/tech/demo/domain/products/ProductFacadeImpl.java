@@ -5,7 +5,10 @@ import org.springframework.stereotype.Service;
 import pl.allegro.tech.demo.infrastructure.products.ProductRepository;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 
@@ -23,6 +26,18 @@ public class ProductFacadeImpl implements ProductFacade {
     public ProductResponseDto findById(String id) {
         Product product = productRepository.findById(id);
         return new ProductResponseDto(product.getId(), product.getName());
+    }
+
+    @Override
+    public ProductsResponseDto findAll() {
+        List<Product> products = productRepository.findAll();
+
+        List<ProductResponseDto> productsResponse = products.stream()
+                .map(ProductResponseDto::new)
+                .sorted(Comparator.comparing(ProductResponseDto::getName))
+                .collect(Collectors.toList());
+
+        return new ProductsResponseDto(productsResponse);
     }
 
     @Override

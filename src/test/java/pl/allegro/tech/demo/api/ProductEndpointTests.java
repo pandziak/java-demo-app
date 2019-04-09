@@ -2,6 +2,7 @@ package pl.allegro.tech.demo.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.catalina.connector.Response;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,20 +11,16 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import pl.allegro.tech.demo.DemoApplicationTests;
-import pl.allegro.tech.demo.domain.products.ProductFacade;
-import pl.allegro.tech.demo.domain.products.ProductRequestDto;
-import pl.allegro.tech.demo.domain.products.ProductResponseDto;
-import pl.allegro.tech.demo.domain.products.ProductUpdateDto;
+import pl.allegro.tech.demo.domain.products.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ProductEndpointTests extends DemoApplicationTests {
-
-    private String BASE_URL = "http://localhost:" + port + "/api/products/";
 
     @Autowired
     ProductFacade productFacade;
@@ -40,7 +37,7 @@ public class ProductEndpointTests extends DemoApplicationTests {
                 httpClient.postForEntity(url, getHttpRequest(productJson), ProductResponseDto.class);
 
         // then
-        assertThat(result.getStatusCodeValue()).isEqualTo(Response.SC_OK);
+        assertThat(result.getStatusCodeValue()).isEqualTo(Response.SC_CREATED);
     }
 
     @Test
@@ -56,6 +53,28 @@ public class ProductEndpointTests extends DemoApplicationTests {
         // then
         assertThat(result.getStatusCodeValue()).isEqualTo(200);
         assertThat(result.getBody()).isEqualToComparingFieldByField(existingProduct);
+    }
+
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+    public void shouldGetExistingProducts() {
+        // given
+        ProductRequestDto requestDto1 = new ProductRequestDto("produkt_A");
+        ProductRequestDto requestDto2 = new ProductRequestDto("produkt_B");
+
+        ProductResponseDto existingProduct1 = productFacade.create(requestDto1);
+        ProductResponseDto existingProduct2 = productFacade.create(requestDto2);
+        final String url = "http://localhost:" + port + "/api/products/";
+
+        // when
+        ResponseEntity<ProductsResponseDto> result = httpClient.getForEntity(url, ProductsResponseDto.class);
+
+        // then
+        ProductsResponseDto productsResponseDto = result.getBody();
+        assertThat(result.getStatusCodeValue()).isEqualTo(200);
+        assertThat(productsResponseDto.getProducts().size()).isEqualTo(2);
+        assertThat(productsResponseDto.getProducts().get(0)).isEqualToComparingFieldByField(existingProduct1);
+        assertThat(productsResponseDto.getProducts().get(1)).isEqualToComparingFieldByField(existingProduct2);
     }
 
     @Test
