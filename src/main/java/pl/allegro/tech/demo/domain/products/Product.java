@@ -17,6 +17,7 @@ public final class Product {
         this.createdAt = createdAt;
     }
 
+    // TODO zmienic na builder lub wither
     static Product copy(Product oldProduct, ProductUpdateDto dto) {
         return new Product(oldProduct.getId(), dto.getName(), oldProduct.getCreatedAt());
     }
