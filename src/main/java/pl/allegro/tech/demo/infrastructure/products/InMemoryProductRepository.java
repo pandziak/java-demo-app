@@ -2,9 +2,13 @@ package pl.allegro.tech.demo.infrastructure.products;
 
 import org.springframework.stereotype.Repository;
 import pl.allegro.tech.demo.domain.products.Product;
+import pl.allegro.tech.demo.domain.products.tag.Tag;
 import pl.allegro.tech.demo.infrastructure.products.exceptions.ProductNotFoundException;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
 
 @Repository
 public class InMemoryProductRepository implements ProductRepository {
@@ -28,8 +32,12 @@ public class InMemoryProductRepository implements ProductRepository {
     }
 
     @Override
-    public List<Product> findAll() {
-        return new ArrayList<>(products.values());
+    public List<Product> findAll(String tag) {
+        return new ArrayList<>(
+                products.values()
+                        .stream()
+                        .filter(p -> isNull(tag) || p.getTags().contains(new Tag(tag)))
+                        .collect(Collectors.toList()));
     }
 
     @Override

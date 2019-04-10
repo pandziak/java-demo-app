@@ -4,7 +4,7 @@ public interface ProductFacade {
 
     ProductResponseDto findById(String id);
 
-    ProductsResponseDto findAll();
+    ProductsResponseDto findAll(String tag);
 
     ProductResponseDto create(ProductRequestDto dto);
 

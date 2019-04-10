@@ -7,7 +7,7 @@ import pl.allegro.tech.demo.DemoApplicationTests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class HelloWorldTests extends DemoApplicationTests {
+public class HelloWorldTests extends DemoApplicationTests {
 
     @Test
     public void shouldReturnGreetings() {
