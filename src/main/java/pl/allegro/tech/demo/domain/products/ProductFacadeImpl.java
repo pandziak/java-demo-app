@@ -2,6 +2,10 @@ package pl.allegro.tech.demo.domain.products;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pl.allegro.tech.demo.domain.products.description.Description;
+import pl.allegro.tech.demo.domain.products.image.Image;
+import pl.allegro.tech.demo.domain.products.price.Price;
+import pl.allegro.tech.demo.domain.products.tag.Tag;
 import pl.allegro.tech.demo.infrastructure.products.ProductRepository;
 
 import java.time.LocalDateTime;
@@ -9,8 +13,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import static java.util.Objects.isNull;
 
 @Service
 public class ProductFacadeImpl implements ProductFacade {
@@ -25,12 +27,12 @@ public class ProductFacadeImpl implements ProductFacade {
     @Override
     public ProductResponseDto findById(String id) {
         Product product = productRepository.findById(id);
-        return new ProductResponseDto(product.getId(), product.getName());
+        return new ProductResponseDto(product);
     }
 
     @Override
-    public ProductsResponseDto findAll() {
-        List<Product> products = productRepository.findAll();
+    public ProductsResponseDto findAll(String tag) {
+        List<Product> products = productRepository.findAll(tag);
 
         List<ProductResponseDto> productsResponse = products.stream()
                 .map(ProductResponseDto::new)
@@ -46,14 +48,19 @@ public class ProductFacadeImpl implements ProductFacade {
             throw new RuntimeException("Product name cannot be empty");
         }
 
-        Product product = new Product(
+        Product product = new Product.Builder(
                 UUID.randomUUID().toString(),
                 dto.getName(),
-                LocalDateTime.now());
+                new Price(dto.getPrice().getAmount(), dto.getPrice().getCurrency()),
+                new Image(dto.getImage().getUrl()),
+                new Description(dto.getDescription().getText()),
+                LocalDateTime.now())
+                .withTags(dto.getTags().stream().map(tag -> new Tag(tag.getName())).collect(Collectors.toList()))
+                .build();
 
         productRepository.save(product);
 
-        return new ProductResponseDto(product.getId(), product.getName());
+        return new ProductResponseDto(product);
     }
 
     @Override
@@ -63,11 +70,19 @@ public class ProductFacadeImpl implements ProductFacade {
         }
 
         Product oldProduct = productRepository.findById(dto.getId());
-        Product updatedProduct = Product.copy(oldProduct, dto);
+        Product updatedProduct = new Product.Builder(
+                oldProduct.getId(),
+                dto.getName(),
+                new Price(dto.getPrice().getAmount(), dto.getPrice().getCurrency()),
+                new Image(dto.getImage().getUrl()),
+                new Description(dto.getDescription().getText()),
+                oldProduct.getCreatedAt())
+                .withTags(dto.getTags().stream().map(tag -> new Tag(tag.getName())).collect(Collectors.toList()))
+                .build();
 
         productRepository.update(updatedProduct);
 
-        return new ProductResponseDto(updatedProduct.getId(), updatedProduct.getName());
+        return new ProductResponseDto(updatedProduct);
     }
 
     @Override

@@ -2,7 +2,6 @@ package pl.allegro.tech.demo.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.catalina.connector.Response;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,15 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import pl.allegro.tech.demo.DemoApplicationTests;
 import pl.allegro.tech.demo.domain.products.*;
+import pl.allegro.tech.demo.domain.products.description.DescriptionDto;
+import pl.allegro.tech.demo.domain.products.image.ImageDto;
+import pl.allegro.tech.demo.domain.products.price.Currency;
+import pl.allegro.tech.demo.domain.products.price.PriceDto;
+import pl.allegro.tech.demo.domain.products.tag.TagDto;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,7 +37,7 @@ public class ProductEndpointTests extends DemoApplicationTests {
     public void shouldCreateProduct() {
         // given
         final String url = "http://localhost:" + port + "/api/products/";
-        final ProductRequestDto productDto = new ProductRequestDto("produkt");
+        final ProductRequestDto productDto = mockProductRequestDto("produkt");
         String productJson = mapToJson(productDto);
 
         // when
@@ -43,7 +51,7 @@ public class ProductEndpointTests extends DemoApplicationTests {
     @Test
     public void shouldGetExistingProduct() {
         // given
-        ProductRequestDto requestDto = new ProductRequestDto("produkt");
+        ProductRequestDto requestDto = mockProductRequestDto("produkt");
         ProductResponseDto existingProduct = productFacade.create(requestDto);
         final String url = "http://localhost:" + port + "/api/products/" + existingProduct.getId();
 
@@ -59,8 +67,8 @@ public class ProductEndpointTests extends DemoApplicationTests {
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     public void shouldGetExistingProducts() {
         // given
-        ProductRequestDto requestDto1 = new ProductRequestDto("produkt_A");
-        ProductRequestDto requestDto2 = new ProductRequestDto("produkt_B");
+        ProductRequestDto requestDto1 = mockProductRequestDto("produkt_A");
+        ProductRequestDto requestDto2 = mockProductRequestDto("produkt_B");
 
         ProductResponseDto existingProduct1 = productFacade.create(requestDto1);
         ProductResponseDto existingProduct2 = productFacade.create(requestDto2);
@@ -80,10 +88,16 @@ public class ProductEndpointTests extends DemoApplicationTests {
     @Test
     public void shouldUpdateProduct() {
         // given
-        ProductRequestDto requestDto = new ProductRequestDto("produkt");
+        ProductRequestDto requestDto = mockProductRequestDto("produkt");
         ProductResponseDto existingProduct = productFacade.create(requestDto);
 
-        ProductUpdateDto toUpdate = new ProductUpdateDto(existingProduct.getId(), "produkt2");
+        ProductUpdateDto toUpdate = new ProductUpdateDto(existingProduct.getId(),
+                "produkt po update",
+                new PriceDto(BigDecimal.valueOf(15L), Currency.EUR),
+                requestDto.getImage(),
+                new DescriptionDto("nowy opis"),
+                Arrays.asList(new TagDto("tag")));
+
         String productJson = mapToJson(toUpdate);
         final String url = "http://localhost:" + port + "/api/products/";
 
@@ -111,7 +125,7 @@ public class ProductEndpointTests extends DemoApplicationTests {
     @Test
     public void shouldDeleteProduct() {
         // given
-        ProductRequestDto requestDto = new ProductRequestDto("produkt");
+        ProductRequestDto requestDto = mockProductRequestDto("produkt");
         ProductResponseDto existingProduct = productFacade.create(requestDto);
 
         final String deleteUrl = "http://localhost:" + port + "/api/products/" + existingProduct.getId();
@@ -123,7 +137,7 @@ public class ProductEndpointTests extends DemoApplicationTests {
         ResponseEntity<String> responseGetEntity = httpClient.getForEntity(getUrl, String.class);
 
         // then
-        assertThat(responseDeleteEntity.getStatusCodeValue()).isEqualTo(200);
+        assertThat(responseDeleteEntity.getStatusCodeValue()).isEqualTo(204);
         assertThat(responseGetEntity.getStatusCodeValue()).isEqualTo(404);
     }
 
@@ -140,5 +154,14 @@ public class ProductEndpointTests extends DemoApplicationTests {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set("content-type", "application/json");
         return new HttpEntity<>(json, httpHeaders);
+    }
+
+    private ProductRequestDto mockProductRequestDto(String name) {
+        return new ProductRequestDto(
+                name,
+                new PriceDto(BigDecimal.TEN, Currency.EUR),
+                new ImageDto(name + "-obrazek.jpg"),
+                new DescriptionDto("Opis bardzo długi."),
+                Arrays.asList(new TagDto("tag1"), new TagDto("tag2")));
     }
 }

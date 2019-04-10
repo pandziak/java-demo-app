@@ -10,7 +10,7 @@ public interface ProductRepository {
 
     Product findById(String id);
 
-    List<Product> findAll();
+    List<Product> findAll(String tag);
 
     Product update(Product product);
 

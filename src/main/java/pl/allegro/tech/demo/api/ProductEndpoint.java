@@ -24,13 +24,14 @@ class ProductEndpoint {
     }
 
     @GetMapping
-    ProductsResponseDto getProducts() {
-        return productFacade.findAll();
+    ProductsResponseDto getProducts(@RequestParam(name = "tag", required = false) String tag) {
+        return productFacade.findAll(tag);
     }
 
     @PostMapping
-    ResponseEntity createProduct(@RequestBody ProductRequestDto requestDto) {
-        return new ResponseEntity(productFacade.create(requestDto), HttpStatus.CREATED);
+    @ResponseStatus(HttpStatus.CREATED)
+    ProductResponseDto createProduct(@RequestBody ProductRequestDto requestDto) {
+        return productFacade.create(requestDto);
     }
 
     @PutMapping // TODO zmienić na dwa paramsy, id i obiekt?
@@ -39,6 +40,7 @@ class ProductEndpoint {
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteProduct(@PathVariable("id") String id) throws ProductNotFoundException {
         productFacade.delete(id);
     }
