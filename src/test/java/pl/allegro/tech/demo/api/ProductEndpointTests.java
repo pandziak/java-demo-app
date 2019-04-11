@@ -21,13 +21,10 @@ import pl.allegro.tech.demo.domain.products.price.PriceDto;
 import pl.allegro.tech.demo.domain.products.tag.TagDto;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ProductEndpointTests extends DemoApplicationTests {
 
     @Autowired
