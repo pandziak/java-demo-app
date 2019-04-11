@@ -10,8 +10,10 @@ import pl.allegro.tech.demo.domain.products.image.ImageDto;
 import pl.allegro.tech.demo.domain.products.price.PriceDto;
 import pl.allegro.tech.demo.domain.products.tag.TagDto;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -37,6 +39,10 @@ public class ProductRequestDto {
         this.price = price;
         this.image = image;
         this.description = description;
+
+        if (isNull(tags)) {
+            tags = new ArrayList<>();
+        }
         this.tags = tags;
     }
 

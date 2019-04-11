@@ -1,6 +1,5 @@
 package pl.allegro.tech.demo.api;
 
-import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
 import pl.allegro.tech.demo.DemoApplicationTests;
